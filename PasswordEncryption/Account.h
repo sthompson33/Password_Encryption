@@ -2,30 +2,31 @@
 #include <string>
 #include <fstream>
 #include <cstdlib>
+#include "Encrypt.h"
 using namespace std;
 
 class Account {
 private:
+	Encrypt code;
 	string username;
 	string password;
-	char key = 'q';
 public:
 	Account();
 	Account(string, string);
+	bool lookForFile();
 	void newAccount();
 	bool validateAccount(string, string);
 	void setUsername(string);
 	void setPassword(string);
 	string getUsername();
 	string getPassword();
-	string encrypt(string);
-	string decrypt(string);
+
 };
 
 //constructor
 Account::Account() {
 	
-	cout << "Username: ";
+	cout << "\nUsername: ";
 	getline(cin, username);
 	cout << "Password: ";
 	getline(cin, password);
@@ -52,51 +53,66 @@ string Account::getPassword() {
 	return password;
 }
 
-void Account::newAccount() {
+/*
+	Check to see if file is open, if not display that it doesnt exist. 
+*/
 
-	ofstream outFile;
-	outFile.open("account.txt", ios::app);
+bool Account::lookForFile() {
 
-	if (outFile.is_open())
-		outFile << encrypt(username) << "#" << encrypt(password) << endl;
-	else
-		cout << "File could not be opened.";
-	outFile.close();
+	bool flag = false;
+	ifstream inFile("account.txt");
+	if (inFile)
+		flag = true;
+	inFile.close();
+	return flag;
 }
 
+/*
+	If the user selects to create a new account, after entering username and password from constructor,
+	newAccount() will be called to write the data in encrypted format to file.
+*/
+
+void Account::newAccount() {
+
+		ofstream outFile;
+		outFile.open("account.txt", ios::app);
+		if (outFile.is_open()) {
+			code.findKey(username);
+			outFile << username << "-" << code.encrypt(password) << endl;
+		}
+		else
+			cout << "\n*** FILE COULD NOT BE OPENED ***\n";
+		outFile.close();
+}
+
+/*
+	
+*/
 bool Account::validateAccount(string u, string p) {
 
+	string user, pass;
+	bool flag = false;
 	ifstream inFile("account.txt");
 	if (inFile.is_open()) {
+		
 		while (!inFile.eof()) {
+
+			getline(inFile, user, '-');
+			getline(inFile, pass);
 			
-			getline(inFile, username, '#');
-			getline(inFile, password);
-			
-			if (u == decrypt(username) && p == decrypt(password)) {
-				return true;
+			code.findKey(user);
+			if (u == user && p == code.decrypt(pass)) {
+				flag = true;
 				break;
 			}
 		}
 		inFile.close();
-		return false;
 	}
 	else {
-		cout << "File could not be found." << endl;
-		exit(EXIT_FAILURE);
+		cout << "\n*** NO ACCOUNTS ON RECORD. PLEASE CREATE NEW ACCOUNT ***\n" << endl;
+		exit(1);
 	}
+	return flag;
 }
 
-string Account::encrypt(string str) {
 
-	for (int i = 0; i < str.size(); i++)
-		str[i] ^= (int(key) + i);
-	return str;
-}
-
-string Account::decrypt(string str) {
-
-	for (int i = 0; i < str.size(); i++)
-		str[i] ^= (int(key) + i);
-	return str;
-}
