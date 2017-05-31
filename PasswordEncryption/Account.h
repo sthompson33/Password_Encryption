@@ -1,3 +1,12 @@
+/*
+	Known BUGS 
+	- methods from Encrypt.h do not work well with any account created with a username 
+	that starts with a lowercase EXAMPLE: stephen instead of Stephen. Check findKey() from Encrypt.h and ASCII setup.
+
+	Features needed
+	-include exception handling for empty input when creating an account.
+*/
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -25,7 +34,7 @@ public:
 
 //constructor
 Account::Account() {
-	
+	//need to check for empty input
 	cout << "\nUsername: ";
 	getline(cin, username);
 	cout << "Password: ";
@@ -54,7 +63,7 @@ string Account::getPassword() {
 }
 
 /*
-	Check to see if file is open, if not display that it doesnt exist. 
+	lookForFile() -- if file exists return true, if not return false. 
 */
 
 bool Account::lookForFile() {
@@ -68,25 +77,27 @@ bool Account::lookForFile() {
 }
 
 /*
-	If the user selects to create a new account, after entering username and password from constructor,
+	If the user selects to create a new account after entering username and password from constructor,
 	newAccount() will be called to write the data in encrypted format to file.
 */
 
 void Account::newAccount() {
 
-		ofstream outFile;
-		outFile.open("account.txt", ios::app);
-		if (outFile.is_open()) {
-			code.findKey(username);
-			outFile << username << "-" << code.encrypt(password) << endl;
-		}
-		else
-			cout << "\n*** FILE COULD NOT BE OPENED ***\n";
+	ofstream outFile;
+	outFile.open("account.txt", ios::app);
+	if (outFile.is_open()) {
+		code.findKey(username);
+		outFile << username << "-" << code.encrypt(password) << endl;
 		outFile.close();
+	}
+	else
+		cout << "\n*** FILE COULD NOT BE OPENED ***\n";
 }
 
 /*
-	
+	validateAccount() -- has two uses from main()
+	1. check to see if account already exists when user selects to make a new account
+	2. check to see if account exist when user selects to sign in
 */
 bool Account::validateAccount(string u, string p) {
 
