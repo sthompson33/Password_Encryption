@@ -1,5 +1,10 @@
 /*
-	Features needed
+	Password_Encryption project -- store all username and passwords for online accounts in one place. 
+	Information stored encrypted to file to protect privacy.
+
+	Created by Stephen Thompson *** STILL A WORK IN PROGRESS *** 
+	
+	Features needed for main().
 	- option for retrying password x number of times before ending program.
 */
 #include <iostream>
@@ -51,7 +56,7 @@ int main() {
 		}
 	
 	}
-	else { //option2 == 2
+	else { //option1 == 2
 	
 		if (user.validateAccount(username, password))
 			option2 = menu();

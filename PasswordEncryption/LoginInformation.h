@@ -100,7 +100,7 @@ void LoginInformation::retrieveLogin(string str) {
 }
 
 /*
-	changeLogin() -- *** work in progress ***
+	changeLogin() -- ***WORK IN PROGRESS ***
 	Allow user to change username or password for a website. 
 */
 
