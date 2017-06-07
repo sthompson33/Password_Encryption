@@ -1,6 +1,8 @@
 /*
-	Known BUGS
-	- deleteLogin() only deletes website from file and not username and password like intended.
+	
+	Known BUGS 
+	- deleteLogin() only deletes website from file and not username and password like intended. <--recently fixed, more testing needed
+	-
 */
 #include <iostream>
 #include <string>
@@ -74,11 +76,7 @@ void LoginInformation::retrieveLogin(string str) {
 		cout << "\nWebsite: ";
 		cin >> site;
 
-		while (!inFile.eof()) {
-
-			getline(inFile, website, '-');
-			getline(inFile, username, '-');
-			getline(inFile, password);
+		while (getline(inFile, website, '-'), getline(inFile, username, '-'), getline(inFile, password)) {
 
 			code.findKey(str);
 			if (site == code.decrypt(website)) {
@@ -111,6 +109,8 @@ void LoginInformation::changeLogin(string str) {
 	cout << "\n1. Change Username\n2. Change Password" << endl;
 	cin >> choice;
 
+
+
 }
 
 /*
@@ -129,17 +129,15 @@ void LoginInformation::deleteLogin(string str) {
 	
 	if (inFile.is_open()) {
 
-		cout << "Website to Delete: ";
+		cout << "\nWebsite to Delete: ";
 		cin >> site;
 		cin.ignore();
 
-		while (!inFile.eof()) {
-
-			getline(inFile, website, '-');
-			getline(inFile, username, '-');
-			getline(inFile, password, '\n');
+		while (getline(inFile, website, '-'), getline(inFile, username, '-'), getline(inFile, password)) {
 
 			code.findKey(str);
+			cout << code.decrypt(website) << " " << code.decrypt(username) << " " << code.decrypt(password) << endl;
+			
 			if (site != code.decrypt(website))
 				tempFile << website << "-" << username << "-" << password << endl;
 		}

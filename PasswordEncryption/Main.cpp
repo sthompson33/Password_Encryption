@@ -6,6 +6,8 @@
 	
 	Features needed for main().
 	- option for retrying password x number of times before ending program.
+
+	********* NEW DELIMITER CHAR NEEDED/ POSSIBLE FOR MORE THAN ONE?/ EX: -- *********
 */
 #include <iostream>
 #include <string>

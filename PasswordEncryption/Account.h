@@ -106,11 +106,8 @@ bool Account::validateAccount(string u, string p) {
 	ifstream inFile("account.txt");
 	if (inFile.is_open()) {
 		
-		while (!inFile.eof()) {
+		while (getline(inFile, user, '-'), getline(inFile, pass)) {
 
-			getline(inFile, user, '-');
-			getline(inFile, pass);
-			
 			code.findKey(user);
 			if (u == user && p == code.decrypt(pass)) {
 				flag = true;
