@@ -22,7 +22,7 @@ public:
 };
 
 void Encrypt::findKey(string str) {
-	key = str[0];
+	key = toupper(str[0]);
 }
 
 string Encrypt::encrypt(string str) {

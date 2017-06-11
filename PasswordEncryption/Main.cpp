@@ -7,7 +7,7 @@
 	Features needed for main().
 	- option for retrying password x number of times before ending program.
 
-	********* NEW DELIMITER CHAR NEEDED/ POSSIBLE FOR MORE THAN ONE?/ EX: -- *********
+	
 */
 #include <iostream>
 #include <string>
@@ -81,7 +81,7 @@ int main() {
 			login.retrieveLogin(username);
 			break;
 		case 3:
-			login.changeLogin(username);
+			login.updateLogin(username);
 			break;
 		case 4:
 			login.deleteLogin(username);
@@ -91,7 +91,8 @@ int main() {
 		}
 		option2 = menu();
 	} while (option2 != 5);
-
+	
+	system("pause");
 	return 0; 
 }//end of main
 

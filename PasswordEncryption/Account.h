@@ -2,6 +2,7 @@
 	Known BUGS 
 	- methods from Encrypt.h do not work well with any account created with a username 
 	that starts with a lowercase EXAMPLE: stephen instead of Stephen. Check findKey() from Encrypt.h and ASCII setup.
+		*** toupper() used in findKey(). Ok for now. 6/7/17 *** 
 
 	Features needed
 	-include exception handling for empty input when creating an account.
@@ -87,7 +88,7 @@ void Account::newAccount() {
 	outFile.open("account.txt", ios::app);
 	if (outFile.is_open()) {
 		code.findKey(username);
-		outFile << username << "-" << code.encrypt(password) << endl;
+		outFile << username << "	" << code.encrypt(password) << endl;
 		outFile.close();
 	}
 	else
@@ -106,7 +107,7 @@ bool Account::validateAccount(string u, string p) {
 	ifstream inFile("account.txt");
 	if (inFile.is_open()) {
 		
-		while (getline(inFile, user, '-'), getline(inFile, pass)) {
+		while (getline(inFile, user, '	'), getline(inFile, pass)) {
 
 			code.findKey(user);
 			if (u == user && p == code.decrypt(pass)) {

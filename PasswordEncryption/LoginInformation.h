@@ -1,7 +1,8 @@
 /*
 	
 	Known BUGS 
-	- deleteLogin() only deletes website from file and not username and password like intended. <--recently fixed, more testing needed
+	- deleteLogin() only deletes website from file and not username and password like intended.
+		*** recently fixed, more testing needed  6/6/17 ***
 	-
 */
 #include <iostream>
@@ -21,7 +22,7 @@ public:
 	LoginInformation(string);
 	void newLogin(string);
 	void retrieveLogin(string);
-	void changeLogin(string);
+	void updateLogin(string);
 	void deleteLogin(string);
 }; 
 
@@ -52,7 +53,7 @@ void LoginInformation::newLogin(string str) {
 		cin >> password;
 
 		code.findKey(str);
-		outFile << code.encrypt(website) << "-" << code.encrypt(username) << "-" << code.encrypt(password) << endl;
+		outFile << code.encrypt(website) << "	" << code.encrypt(username) << "	" << code.encrypt(password) << endl;
 	
 		outFile.close();
 	}
@@ -76,7 +77,7 @@ void LoginInformation::retrieveLogin(string str) {
 		cout << "\nWebsite: ";
 		cin >> site;
 
-		while (getline(inFile, website, '-'), getline(inFile, username, '-'), getline(inFile, password)) {
+		while (getline(inFile, website, '	'), getline(inFile, username, '	'), getline(inFile, password)) {
 
 			code.findKey(str);
 			if (site == code.decrypt(website)) {
@@ -98,19 +99,61 @@ void LoginInformation::retrieveLogin(string str) {
 }
 
 /*
-	changeLogin() -- ***WORK IN PROGRESS ***
+	changeLogin() -- *** Testing Needed ***
 	Allow user to change username or password for a website. 
 */
 
-void LoginInformation::changeLogin(string str) {
+void LoginInformation::updateLogin(string str) {
 
-	string newInput;
 	int choice;
-	cout << "\n1. Change Username\n2. Change Password" << endl;
-	cin >> choice;
+	string fileName = str + ".txt";
+	string site, newInput;
+	ofstream tempFile;
+	tempFile.open("temp.txt", ios::app);
+	ifstream inFile(str + ".txt");
 
+	if (inFile.is_open()) {
 
+		cout << "\nWebsite to Update: ";
+		cin >> site;
+		
+		do {
+			cout << "\nWhich to update\n1. Username\n2. Password\n>> ";
+			cin >> choice;
+		} while (choice < 1 || choice > 2);
+		
 
+		if (choice == 1) {
+			cout << "\nNew Username\n>> ";
+			cin >> newInput;
+		}
+		else
+		{
+			cout << "\nNew Password\n>> ";
+			cin >> newInput;
+		}
+
+		cin.ignore();
+		while (getline(inFile, website, '	'), getline(inFile, username, '	'), getline(inFile, password)) {
+
+			code.findKey(str);
+			if (site == code.decrypt(website)) {
+				(choice == 1)  ? username = code.encrypt(newInput) : password = code.encrypt(newInput);
+				tempFile << website << "	" << username << "	" << password << endl;
+			}
+			else
+				tempFile << website << "	" << username << "	" << password << endl;
+		}
+
+		inFile.close();
+		tempFile.close();
+
+		const char * c = fileName.c_str();
+		remove(c);
+		rename("temp.txt", c);
+	}
+	else
+		cout << "\n*** FILE COULD NOT BE OPENED ***\n";
 }
 
 /*
@@ -133,13 +176,11 @@ void LoginInformation::deleteLogin(string str) {
 		cin >> site;
 		cin.ignore();
 
-		while (getline(inFile, website, '-'), getline(inFile, username, '-'), getline(inFile, password)) {
+		while (getline(inFile, website, '	'), getline(inFile, username, '	'), getline(inFile, password)) {
 
 			code.findKey(str);
-			cout << code.decrypt(website) << " " << code.decrypt(username) << " " << code.decrypt(password) << endl;
-			
 			if (site != code.decrypt(website))
-				tempFile << website << "-" << username << "-" << password << endl;
+				tempFile << website << "	" << username << "	" << password << endl;
 		}
 	
 		inFile.close();
