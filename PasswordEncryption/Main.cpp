@@ -12,55 +12,117 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <exception>
 #include "Account.h"
 #include "LoginInformation.h"
 using namespace std;
 
-//function prototypes
-int menu();
+int openingMenu() {
+	int choice;
+	do {
+		cout << "\n1. Create New Account" << endl;
+		cout << "2. Sign In" << endl;
+		cout << ">> ";
+		cin >> choice;
+		cin.ignore();
+	} while (choice > 2 || choice <= 0);
+	return choice;
+}
+
+string getUsername() {
+	string input;
+	cout << "\nUsername: ";
+	getline(cin, input);
+
+	if (input.empty()) {
+		runtime_error error("\n*** USERNAME LEFT BLANK ***\n");
+		throw(error);
+	}
+	
+	if (!isalpha(input[0])) {
+		runtime_error error("\n*** USERNAME MUST BEGIN WITH AN ALPHABET CHARACTER ***\n");
+		throw(error);
+	}
+	return input;
+}
+
+string getPassword() {
+	string input;
+	cout << "Password: ";
+	getline(cin, input);
+
+	if (input.empty()) {
+		runtime_error error("\n*** PASSWORD LEFT BLANK ***\n");
+		throw(error);
+	}
+
+	if (input.length() < 5) {
+		runtime_error error("\n*** PASSWORD MUST BE LONGER THAN 5 CHARACTERS ***\n");
+		throw(error);
+	}
+	return input;
+}
+
+int menu() {
+	int choice;
+	do {
+		cout << "\nLogin Information Menu" << endl;
+		cout << "\n1. Add New\n2. Retrieve \n3. Change \n4. Delete \n5. Exit" << endl;
+		cout << ">> ";
+		cin >> choice;
+		cin.ignore();
+	} while (choice <= 0 || choice > 5);
+	return choice;
+}
+
 
 int main() {
 
 	int option1;//used for first choice
 	int	option2;//used for choice from menu()
+	string username, password;
+	bool flag;
+	
+	option1 = openingMenu();
 	
 	do {
-		cout << "1. Create New Account" << endl;
-		cout << "2. Sign In" << endl;
-		cout << ">> ";
-		cin >> option1;
-		cin.ignore();
-	} while (option1 > 2 || option1 == 0);
+		flag = false;
+		try {
+			username = getUsername();
+			password = getPassword();
+		}
+		catch (runtime_error e) {
+			cout << e.what();
+			flag = true;
+		}
+	} while(flag);
 
-	//create Account object using default constructor
-	//constructor will ask for username and password
-	Account user;
-	string username = user.getUsername();
-	string password = user.getPassword();
-
+	Account userAccount(username, password);
+	
 	if (option1 == 1) {
 
-		if (user.lookForFile()) {
+		if (userAccount.lookForFile()) {
 
-			if (user.validateAccount(username, password)) {
+			if (userAccount.validateAccount(username, password)) {
 				cout << "\n*** ACCOUNT ALREADY EXISTS ***\n" << endl;
+				system("pause");
 				return 0;
 			}
 			else {
-				user.newAccount();
+				userAccount.newAccount();
 				option2 = menu();
 			}
 		
 		}
 		else {
-			user.newAccount();
+			userAccount.newAccount();
 			option2 = menu();
 		}
 	
 	}
 	else { //option1 == 2
 	
-		if (user.validateAccount(username, password))
+		if (userAccount.validateAccount(username, password))
 			option2 = menu();
 		else { 
 			//needs option to retry password x number of times before ending program
@@ -68,6 +130,8 @@ int main() {
 			return 0;
 		}
 	}
+
+	
 
 	//create LoginInformation object
 	//username sent to constructor to create user file to hold login information
@@ -92,18 +156,10 @@ int main() {
 		option2 = menu();
 	} while (option2 != 5);
 	
-	system("pause");
+	
 	return 0; 
-}//end of main
-
-int menu() {
-	int choice;
-	do {
-		cout << "\nLogin Information Menu" << endl;
-		cout << "\n1. Add New\n2. Retrieve \n3. Change \n4. Delete \n5. Exit" << endl;
-		cout << ">> ";
-		cin >> choice;
-		cin.ignore();
-	} while (choice <= 0 || choice > 5);
-	return choice;
 }
+
+
+
+

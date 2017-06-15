@@ -105,6 +105,7 @@ void LoginInformation::retrieveLogin(string str) {
 
 void LoginInformation::updateLogin(string str) {
 
+	bool flag = false;
 	int choice;
 	string fileName = str + ".txt";
 	string site, newInput;
@@ -151,6 +152,11 @@ void LoginInformation::updateLogin(string str) {
 		const char * c = fileName.c_str();
 		remove(c);
 		rename("temp.txt", c);
+
+		if (!flag) {
+			cout << "\n*** NO LOGIN INFORMATION FOR " << site << " FOUND ***" << endl;
+			exit(1);
+		}
 	}
 	else
 		cout << "\n*** FILE COULD NOT BE OPENED ***\n";

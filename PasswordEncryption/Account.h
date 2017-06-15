@@ -16,12 +16,12 @@
 using namespace std;
 
 class Account {
+	
 private:
 	Encrypt code;
 	string username;
 	string password;
 public:
-	Account();
 	Account(string, string);
 	bool lookForFile();
 	void newAccount();
@@ -34,14 +34,6 @@ public:
 };
 
 //constructor
-Account::Account() {
-	//need to check for empty input
-	cout << "\nUsername: ";
-	getline(cin, username);
-	cout << "Password: ";
-	getline(cin, password);
-}
-
 Account::Account(string u, string p) {
 	username = u;
 	password = p;
