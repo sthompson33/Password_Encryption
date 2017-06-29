@@ -22,7 +22,7 @@ private:
 	string username;
 	string password;
 public:
-	Account(string, string);
+	Account();
 	bool lookForFile();
 	void newAccount();
 	bool validateAccount(string, string);
@@ -34,9 +34,42 @@ public:
 };
 
 //constructor
-Account::Account(string u, string p) {
-	username = u;
-	password = p;
+Account::Account() {
+	
+	string input;
+	bool correctInput;
+	
+	do {
+		correctInput = true;
+		cout << "\nUsername: ";
+		getline(cin, input);
+
+		if (input.empty()) {
+			cout << "\n*** USERNAME CANNOT BE BLANK ***\n";
+			correctInput = false;
+		}
+		else if (!isalpha(input[0])) {
+			cout << "\n*** USERNAME MUST BEGIN WITH AN ALPHABET CHARACTER ***\n";
+			correctInput = false;
+		}
+	} while (!correctInput);
+	username = input;
+
+	do {
+		correctInput = true;
+		cout << "Password: ";
+		getline(cin, input);
+		
+		if (input.empty()) {
+			cout << "\n*** PASSWORD CANNOT BE BLANK ***\n";
+			correctInput = false;
+		}
+		else if (input.length() < 5) {
+			cout << "\n*** PASSWORD MUST BE LONGER THAN 5 CHARACTERS ***\n";
+			correctInput = false;
+		}
+	} while (!correctInput);
+	password = input;
 }
 
 void Account::setUsername(string u) {
@@ -111,7 +144,7 @@ bool Account::validateAccount(string u, string p) {
 	}
 	else {
 		cout << "\n*** NO ACCOUNTS ON RECORD. PLEASE CREATE NEW ACCOUNT ***\n" << endl;
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	return flag;
 }
