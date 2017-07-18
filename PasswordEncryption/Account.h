@@ -1,28 +1,25 @@
 /*
-	Known BUGS 
-	- methods from Encrypt.h do not work well with any account created with a username 
-	that starts with a lowercase EXAMPLE: stephen instead of Stephen. Check findKey() from Encrypt.h and ASCII setup.
-		*** toupper() used in findKey(). Ok for now. 6/7/17 *** 
+	
 
-	Features needed
-	-include exception handling for empty input when creating an account.
 */
 
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <cstdlib>
+#include <exception>
 #include "Encrypt.h"
 using namespace std;
 
 class Account {
-	
+	friend istream& operator >> (istream&, Account&) throw(runtime_error);
 private:
 	Encrypt code;
 	string username;
 	string password;
 public:
 	Account();
+	Account(string, string);
 	bool lookForFile();
 	void newAccount();
 	bool validateAccount(string, string);
@@ -33,43 +30,48 @@ public:
 
 };
 
-//constructor
+/*
+	overloaded operator >> for getting username and password input.  
+	Exception handling included...
+	Username must begin with an alphabet character.
+	Password must be longer than 5 characters long
+	Both cannot be NULL
+*/
+istream& operator >> (istream& in, Account& acct) throw(runtime_error) {
+	
+	cout << "\nUsername: ";
+	getline(in, acct.username);
+
+	if (acct.username.empty()) {
+		runtime_error error("\n*** USERNAME CANNOT BE BLANK ***\n");
+		throw(error);
+	}
+	else if (!isalpha(acct.username[0])) {
+		runtime_error error("\n*** USERNAME MUST BEGIN WITH AN ALPHABET CHARACTER ***\n");
+		throw(error);
+	}
+
+	cout << "Password: ";
+	getline(in, acct.password);
+
+	if (acct.password.empty()) {
+		runtime_error error("\n*** PASSWORD CANNOT BE BLANK ***\n");
+		throw(error);
+	}
+	else if (acct.password.length() < 6) {
+		runtime_error error("\n*** PASSWORD MUST BE LONGER THAN 5 CHARACTERS ***\n");
+		throw (error);
+	}
+}
+
+//constructors
 Account::Account() {
-	
-	string input;
-	bool correctInput;
-	
-	do {
-		correctInput = true;
-		cout << "\nUsername: ";
-		getline(cin, input);
 
-		if (input.empty()) {
-			cout << "\n*** USERNAME CANNOT BE BLANK ***\n";
-			correctInput = false;
-		}
-		else if (!isalpha(input[0])) {
-			cout << "\n*** USERNAME MUST BEGIN WITH AN ALPHABET CHARACTER ***\n";
-			correctInput = false;
-		}
-	} while (!correctInput);
-	username = input;
+}
 
-	do {
-		correctInput = true;
-		cout << "Password: ";
-		getline(cin, input);
-		
-		if (input.empty()) {
-			cout << "\n*** PASSWORD CANNOT BE BLANK ***\n";
-			correctInput = false;
-		}
-		else if (input.length() < 5) {
-			cout << "\n*** PASSWORD MUST BE LONGER THAN 5 CHARACTERS ***\n";
-			correctInput = false;
-		}
-	} while (!correctInput);
-	password = input;
+Account::Account(string u, string p) {
+	username = u;
+	password = p;
 }
 
 void Account::setUsername(string u) {
@@ -90,21 +92,21 @@ string Account::getPassword() {
 
 /*
 	lookForFile() -- if file exists return true, if not return false. 
+
 */
 
 bool Account::lookForFile() {
 
-	bool flag = false;
+	bool found = false;
 	ifstream inFile("account.txt");
 	if (inFile)
-		flag = true;
+		found = true;
 	inFile.close();
-	return flag;
+	return found;
 }
 
 /*
-	If the user selects to create a new account after entering username and password from constructor,
-	newAccount() will be called to write the data in encrypted format to file.
+	newAccount() -- write new account information to account.txt in encrypted format.
 */
 
 void Account::newAccount() {
@@ -113,7 +115,7 @@ void Account::newAccount() {
 	outFile.open("account.txt", ios::app);
 	if (outFile.is_open()) {
 		code.findKey(username);
-		outFile << username << "	" << code.encrypt(password) << endl;
+		outFile << username << "~" << code.encrypt(password) << endl;
 		outFile.close();
 	}
 	else
@@ -124,19 +126,22 @@ void Account::newAccount() {
 	validateAccount() -- has two uses from main()
 	1. check to see if account already exists when user selects to make a new account
 	2. check to see if account exist when user selects to sign in
+
+	Parameter(s) -- u for username entered by user
+		         -- p for password entered by user
 */
 bool Account::validateAccount(string u, string p) {
 
 	string user, pass;
-	bool flag = false;
+	bool found = false;
 	ifstream inFile("account.txt");
 	if (inFile.is_open()) {
 		
-		while (getline(inFile, user, '	'), getline(inFile, pass)) {
+		while (getline(inFile, user, '~'), getline(inFile, pass)) {
 
 			code.findKey(user);
 			if (u == user && p == code.decrypt(pass)) {
-				flag = true;
+				found = true;
 				break;
 			}
 		}
@@ -144,9 +149,10 @@ bool Account::validateAccount(string u, string p) {
 	}
 	else {
 		cout << "\n*** NO ACCOUNTS ON RECORD. PLEASE CREATE NEW ACCOUNT ***\n" << endl;
+		getchar();
 		exit(EXIT_FAILURE);
 	}
-	return flag;
+	return found;
 }
 
 

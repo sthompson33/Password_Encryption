@@ -20,8 +20,12 @@ int openingMenu() {
 		cout << "2. Sign In" << endl;
 		cout << ">> ";
 		cin >> choice;
-		cin.ignore();
-	} while (choice > 2 || choice <= 0);
+		if (!cin) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
+	} while (choice < 1 || choice > 2);
+	cin.ignore();
 	return choice;
 }
 
@@ -32,62 +36,79 @@ int loginMenu() {
 		cout << "\n1. Add New\n2. Retrieve \n3. Update \n4. Delete \n5. Exit" << endl;
 		cout << ">> ";
 		cin >> choice;
-		cin.ignore();
-	} while (choice <= 0 || choice > 5);
+		if (!cin) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
+	} while (choice < 1 || choice > 5);
+	cin.ignore();
 	return choice;
 }
 
 int main() {
 	
-	int option1;//used for openingMenu()
-	int	option2;//used for loginMenu()
+	int openingMenuChoice, loginMenuChoice;
+	int failedTries = 0;
 	string username, password;
-	
+	bool correctInput, validInput;
+
 	cout << "\n\t\t\t*** PASSWORD ENCRYPTION ***" << endl;
-	option1 = openingMenu();
+	openingMenuChoice = openingMenu();
 	Account userAccount;
-	username = userAccount.getUsername();
-	password = userAccount.getPassword();
 
-	if (option1 == 1) {
-
-		if (userAccount.lookForFile()) {
-
-			if (userAccount.validateAccount(username, password)) {
-				cout << "\n*** ACCOUNT ALREADY EXISTS ***\n" << endl;
-				system("pause");
-				return 0;
-			}
-			else {
-				userAccount.newAccount();
-				option2 = loginMenu();
-			}
+	do {
+		validInput = true;
 		
-		}
-		else {
-			userAccount.newAccount();
-			option2 = loginMenu();
-		}
-	
-	}
-	else { //option1 == 2
-	
-		if (userAccount.validateAccount(username, password))
-			option2 = loginMenu();
-		else { 
-			//needs option to retry password x number of times before ending program
-			cout << "\n*** USERNAME OR PASSWORD INCORRECT ***\n" << endl;
-			return 0;
-		}
-	}
+		do {
+			correctInput = true;
+			try {
+				cin >> userAccount;
+			}
+			catch (runtime_error e) {
+				cout << e.what();
+				correctInput = false;
+			}
+		} while (!correctInput);
 
-	
+		username = userAccount.getUsername();
+		password = userAccount.getPassword();
+
+		if (openingMenuChoice == 1) { //create a new account option
+
+			if (userAccount.lookForFile()) {
+
+				if (userAccount.validateAccount(username, password)) {
+					cout << "\n*** ACCOUNT ALREADY EXISTS ***\n" << endl;
+					validInput = false;
+				}
+			}
+
+			if(validInput)
+				userAccount.newAccount();
+		}
+		else { //sign in to existing account option
+
+			if (!(userAccount.validateAccount(username, password))){
+				cout << "\n*** USERNAME OR PASSWORD INCORRECT ***" << endl;
+				failedTries++;
+				validInput = false;
+
+				if (failedTries > 2) {
+					cout << "\n*** MAX NUMBER OF TRIES REACHED ***\n";
+					getchar();
+					return 0;
+				}
+			}
+		}
+	} while (!validInput);
+
+	loginMenuChoice = loginMenu();
 
 	//create LoginInformation object
 	//username sent to constructor to create user file to hold website login information
 	LoginInformation login(username);
 	do {
-		switch (option2) {
+		switch (loginMenuChoice) {
 		case 1:
 			login.newLogin(username);
 			break;
@@ -103,11 +124,10 @@ int main() {
 		default:
 			return 0;
 		}
-		option2 = loginMenu();
-	} while (option2 != 5);
-	
-	
-	return 0; 
+		loginMenuChoice = loginMenu();
+	} while (loginMenuChoice != 5);
+
+	return 0;
 }
 
 
