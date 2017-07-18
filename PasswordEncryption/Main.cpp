@@ -2,78 +2,113 @@
 	Password_Encryption project -- store all username and passwords for online accounts in one place. 
 	Information stored encrypted to file to protect privacy.
 
-	Created by Stephen Thompson *** STILL A WORK IN PROGRESS *** 
-	
-	Features needed for main().
-	- option for retrying password x number of times before ending program.
-
-	
+	Created by Stephen Thompson
 */
+
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <exception>
 #include "Account.h"
 #include "LoginInformation.h"
 using namespace std;
 
-//function prototypes
-int menu();
-
-int main() {
-
-	int option1;//used for first choice
-	int	option2;//used for choice from menu()
-	
+int openingMenu() {
+	int choice;
 	do {
-		cout << "1. Create New Account" << endl;
+		cout << "\n1. Create New Account" << endl;
 		cout << "2. Sign In" << endl;
 		cout << ">> ";
-		cin >> option1;
-		cin.ignore();
-	} while (option1 > 2 || option1 == 0);
+		cin >> choice;
+		if (!cin) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
+	} while (choice < 1 || choice > 2);
+	cin.ignore();
+	return choice;
+}
 
-	//create Account object using default constructor
-	//constructor will ask for username and password
-	Account user;
-	string username = user.getUsername();
-	string password = user.getPassword();
+int loginMenu() {
+	int choice;
+	do {
+		cout << "\nLogin Information Menu" << endl;
+		cout << "\n1. Add New\n2. Retrieve \n3. Update \n4. Delete \n5. Exit" << endl;
+		cout << ">> ";
+		cin >> choice;
+		if (!cin) {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
+	} while (choice < 1 || choice > 5);
+	cin.ignore();
+	return choice;
+}
 
-	if (option1 == 1) {
+int main() {
+	
+	int openingMenuChoice, loginMenuChoice;
+	int failedTries = 0;
+	string username, password;
+	bool correctInput, validInput;
 
-		if (user.lookForFile()) {
+	cout << "\n\t\t\t*** PASSWORD ENCRYPTION ***" << endl;
+	openingMenuChoice = openingMenu();
+	Account userAccount;
 
-			if (user.validateAccount(username, password)) {
-				cout << "\n*** ACCOUNT ALREADY EXISTS ***\n" << endl;
-				return 0;
-			}
-			else {
-				user.newAccount();
-				option2 = menu();
-			}
+	do {
+		validInput = true;
 		
+		do {
+			correctInput = true;
+			try {
+				cin >> userAccount;
+			}
+			catch (runtime_error e) {
+				cout << e.what();
+				correctInput = false;
+			}
+		} while (!correctInput);
+
+		username = userAccount.getUsername();
+		password = userAccount.getPassword();
+
+		if (openingMenuChoice == 1) { //create a new account option
+
+			if (userAccount.lookForFile()) {
+
+				if (userAccount.validateAccount(username, password)) {
+					cout << "\n*** ACCOUNT ALREADY EXISTS ***\n" << endl;
+					validInput = false;
+				}
+			}
+
+			if(validInput)
+				userAccount.newAccount();
 		}
-		else {
-			user.newAccount();
-			option2 = menu();
+		else { //sign in to existing account option
+
+			if (!(userAccount.validateAccount(username, password))){
+				cout << "\n*** USERNAME OR PASSWORD INCORRECT ***" << endl;
+				failedTries++;
+				validInput = false;
+
+				if (failedTries > 2) {
+					cout << "\n*** MAX NUMBER OF TRIES REACHED ***\n";
+					getchar();
+					return 0;
+				}
+			}
 		}
-	
-	}
-	else { //option1 == 2
-	
-		if (user.validateAccount(username, password))
-			option2 = menu();
-		else { 
-			//needs option to retry password x number of times before ending program
-			cout << "\n*** USERNAME OR PASSWORD INCORRECT ***\n" << endl;
-			return 0;
-		}
-	}
+	} while (!validInput);
+
+	loginMenuChoice = loginMenu();
 
 	//create LoginInformation object
-	//username sent to constructor to create user file to hold login information
+	//username sent to constructor to create user file to hold website login information
 	LoginInformation login(username);
 	do {
-		switch (option2) {
+		switch (loginMenuChoice) {
 		case 1:
 			login.newLogin(username);
 			break;
@@ -89,21 +124,12 @@ int main() {
 		default:
 			return 0;
 		}
-		option2 = menu();
-	} while (option2 != 5);
-	
-	system("pause");
-	return 0; 
-}//end of main
+		loginMenuChoice = loginMenu();
+	} while (loginMenuChoice != 5);
 
-int menu() {
-	int choice;
-	do {
-		cout << "\nLogin Information Menu" << endl;
-		cout << "\n1. Add New\n2. Retrieve \n3. Change \n4. Delete \n5. Exit" << endl;
-		cout << ">> ";
-		cin >> choice;
-		cin.ignore();
-	} while (choice <= 0 || choice > 5);
-	return choice;
+	return 0;
 }
+
+
+
+
