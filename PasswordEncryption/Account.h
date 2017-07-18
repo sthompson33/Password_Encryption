@@ -1,5 +1,5 @@
 /*
-	
+
 
 */
 
@@ -37,6 +37,7 @@ public:
 	Password must be longer than 5 characters long
 	Both cannot be NULL
 */
+
 istream& operator >> (istream& in, Account& acct) throw(runtime_error) {
 	
 	cout << "\nUsername: ";
@@ -74,6 +75,7 @@ Account::Account(string u, string p) {
 	password = p;
 }
 
+//mutators
 void Account::setUsername(string u) {
 	username = u;
 }
@@ -82,6 +84,7 @@ void Account::setPassword(string p) {
 	password = p;
 }
 
+//accessors
 string Account::getUsername() {
 	return username;
 }
@@ -130,6 +133,7 @@ void Account::newAccount() {
 	Parameter(s) -- u for username entered by user
 		         -- p for password entered by user
 */
+
 bool Account::validateAccount(string u, string p) {
 
 	string user, pass;

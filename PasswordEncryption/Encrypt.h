@@ -1,4 +1,6 @@
 /*
+	class Encrypt
+
 	* Both encrypt() and decrypt() 
 		-- include if statements to detect and change specific characters during ciphering that could disrupt data.
 		

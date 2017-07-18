@@ -1,5 +1,5 @@
 /*
-	
+
 
 */
 
@@ -7,7 +7,6 @@
 #include <string>
 #include <fstream>
 #include <cstdio>
-//#include "Encrypt.h" <-----why getting redundant error for this? 
 using namespace std;
 
 class LoginInformation {

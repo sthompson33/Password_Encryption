@@ -21,6 +21,7 @@ int openingMenu() {
 		cout << ">> ";
 		cin >> choice;
 		if (!cin) {
+			//clear any input that does not match a valid choice including strings
 			cin.clear();
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		}
@@ -37,6 +38,7 @@ int loginMenu() {
 		cout << ">> ";
 		cin >> choice;
 		if (!cin) {
+			//clear any input that does not match a valid choice including strings
 			cin.clear();
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		}
@@ -62,6 +64,7 @@ int main() {
 		do {
 			correctInput = true;
 			try {
+				//ask for username and password with overloaded >> operator
 				cin >> userAccount;
 			}
 			catch (runtime_error e) {
