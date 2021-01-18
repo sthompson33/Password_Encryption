@@ -5,7 +5,7 @@
 <h5>Opening Menu</h5>
 <img src = "images/OpeningMenu.png">
 <p>Create New Account creates a new record in the account.txt file which will store username and password entered. A separate file will be created specifically for that user to hold their login information. Error message will display if that record already exist to prevent ambiguity.</p>
-<p>Sign In allows user to enter their username and password, checks account.txt for a match. If no match is present, message will display username or password incorrect and will give the user another chance. Up to 3 failed tries allowed before program closes.</p>
+<p>Sign In allows user to enter their username and password, checks account.txt for a match. If no match is present, message will display username or password incorrect and will give the user another chance. Up to 3 failed tries allowed before the program closes.</p>
 <p>Example of an account created for program stored on account.txt</p>
 <img src = "images/AccountTest.png">
 
